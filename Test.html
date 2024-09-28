@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gyroskop Animasjon</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #ffffff;
+        }
+
+        .tower {
+            position: relative;
+            width: 100px; /* Bredde på tårnet */
+            height: 300px; /* Høyde på tårnet */
+            overflow: hidden;
+        }
+
+        .circle {
+            position: absolute;
+            width: 80px;
+            height: 60px;
+            border-radius: 50%;
+            border: 2px solid rgba(226, 213, 170, 1); /* Gul farge for hule sirkler */
+            background-color: rgba(255, 255, 0, 0); /* Gjennomsiktig bakgrunn */
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0; /* Start som usynlig */
+            transition: opacity 0.1s ease-in-out; /* Økt varighet for jevnere overgang */
+        }
+
+        /* Styler for slider */
+        .slider {
+            margin-top: 20px;
+            width: 300px;
+        }
+    </style>
+</head>
+<body>
+    <div class="tower" id="tower"></div>
+    <input type="range" id="slider" class="slider" min="0" max="90" value="0" />
+
+    <script>
+        const tower = document.getElementById('tower');
+        const slider = document.getElementById('slider');
+
+        const numCircles = 10; // Antall sirkler
+        const circles = [];
+        
+        // Opprett sirkler
+        for (let i = 0; i < numCircles; i++) {
+            const circle = document.createElement('div');
+            circle.classList.add('circle');
+            circle.style.bottom = `${i * 30}px`; // Juster høyden mellom sirklene
+            circles.push(circle);
+            tower.appendChild(circle);
+        }
+
+        // Funksjon for å oppdatere synligheten av sirkler
+        function updateCircles(value) {
+            const visibleCount = Math.floor(value / 10); // Bestem hvor mange sirkler som skal være synlige
+            circles.forEach((circle, index) => {
+                let opacityValue = 0; // Start som usynlig
+
+                // Sett opacitet for synlige sirkler
+                if (index < visibleCount) {
+                    // Den øverste sirkelen skal alltid ha 100 % opacitet
+                    if (index === visibleCount - 1) {
+                        opacityValue = 1; // 100% opacitet for den øverste synlige sirkelen
+                    } else {
+                        opacityValue = (index) / (visibleCount - 1); // Gradvis nedover for de andre
+                    }
+                }
+
+                circle.style.opacity = opacityValue;
+            });
+        }
+
+        // Sjekk om gyroskop er tilgjengelig
+        if (window.DeviceOrientationEvent) {
+            window.addEventListener('deviceorientation', (event) => {
+                const gamma = event.gamma; // Høyre-venstre bevegelse
+                updateCircles(gamma + 45); // Juster verdien for å være mellom 0 og 90
+            });
+        } else {
+            alert('Gyroskop er ikke tilgjengelig. Bruk slideren for å simulere!');
+        }
+
+        // Håndter sliderbevegelse
+        slider.addEventListener('input', (event) => {
+            const value = event.target.value;
+            updateCircles(value);
+        });
+    </script>
+</body>
+</html>
