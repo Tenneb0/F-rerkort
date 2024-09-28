@@ -110,7 +110,7 @@
         for (let i = 0; i < numCircles; i++) {
             const circle = document.createElement('div');
             circle.classList.add('circle');
-            circle.style.bottom = `${i * 10}px`; // Juster høyden mellom sirklene
+            circle.style.bottom = `${i * 15}px`; // Juster høyden mellom sirklene
             circles.push(circle);
             tower.appendChild(circle);
         }
@@ -135,18 +135,32 @@
             });
         }
 
-        // Sjekk om gyroskop er tilgjengelig
-        if (window.DeviceOrientationEvent) {
-            window.addEventListener('deviceorientation', (event) => {
-                const gamma = event.gamma; // Høyre-venstre bevegelse
-                const adjustedValue = Math.min(Math.max(gamma + 45, 24), 90); // Juster verdien for å være mellom 24 og 90
-                updateCircles(adjustedValue);
-                slider.value = adjustedValue; // Oppdater sliderens verdi
-                sliderValue.textContent = `Verdi: ${Math.round(adjustedValue)}`; // Oppdater visningen av verdien
-            });
-        } else {
-            alert('Gyroskop er ikke tilgjengelig. Bruk slideren for å simulere!');
+        // Funksjon for å be om gyroskop-tillatelse
+        function requestGyroPermission() {
+            if (typeof DeviceMotionEvent.requestPermission === 'function') {
+                DeviceMotionEvent.requestPermission().then(permissionState => {
+                    if (permissionState === 'granted') {
+                        window.addEventListener('deviceorientation', handleOrientation);
+                    }
+                }).catch(console.error);
+            } else {
+                window.addEventListener('deviceorientation', handleOrientation);
+            }
         }
+
+        // Håndter gyroskopbevegelser
+        function handleOrientation(event) {
+            const gamma = event.gamma; // Høyre-venstre bevegelse
+            const adjustedValue = Math.min(Math.max(gamma + 45, 24), 90); // Juster verdien for å være mellom 24 og 90
+            updateCircles(adjustedValue);
+            slider.value = adjustedValue; // Oppdater sliderens verdi
+            sliderValue.textContent = `Verdi: ${Math.round(adjustedValue)}`; // Oppdater visningen av verdien
+        }
+
+        // Be om tillatelse ved oppstart
+        window.addEventListener('load', () => {
+            requestGyroPermission();
+        });
 
         // Håndter sliderbevegelse
         slider.addEventListener('input', (event) => {
