@@ -83,6 +83,22 @@
         .hidden {
             display: none;
         }
+
+        /* Knapp styling */
+        .permission-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .permission-btn:active {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 <body>
@@ -94,10 +110,15 @@
     <input type="range" id="slider" class="slider" min="0" max="90" value="24" />
     <div id="sliderValue">Verdi: 24</div> <!-- Flyttet her for bedre kontroll -->
 
+    <!-- Tillatelse-knapp -->
+    <button id="permissionBtn" class="permission-btn">Be om gyroskop-tillatelse</button>
+
     <script>
         const tower = document.getElementById('tower');
         const slider = document.getElementById('slider');
         const sliderValue = document.getElementById('sliderValue');
+        const permissionBtn = document.getElementById('permissionBtn');
+        let clickCount = 0; // Teller for antall klikk på knappen
 
         const numCircles = 10; // Antall sirkler
         const circles = [];
@@ -153,7 +174,7 @@
             }
         }
 
-         // Funksjon som håndterer gyroskop-orientering
+        // Funksjon som håndterer gyroskop-orientering
         function handleOrientation(event) {
             const beta = event.beta; // Bytt til beta for opp-ned bevegelse (peker mot og vekk fra deg)
             if (beta === null || beta === undefined) return;
@@ -168,12 +189,15 @@
             updateCircles(adjustedValue);
         }
 
-        // Sjekk om gyroskop er tilgjengelig
-        if (window.DeviceOrientationEvent) {
-            requestGyroPermission();
-        } else {
-            alert('Gyroskop er ikke tilgjengelig på denne enheten. Bruk slideren for å simulere.');
-        }
+        // Funksjon for å håndtere klikk på tillatelse-knappen
+        permissionBtn.addEventListener('click', () => {
+            clickCount++;
+            if (clickCount >= 3) {
+                // Fjern knappen etter 3 klikk
+                permissionBtn.style.display = 'none';
+            }
+            requestGyroPermission(); // Be om gyroskop-tillatelse
+        });
 
         // Håndter sliderbevegelse
         slider.addEventListener('input', (event) => {
