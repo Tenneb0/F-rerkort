@@ -83,9 +83,22 @@
         .hidden {
             display: none;
         }
+
+        /* Knapp-stil for å sikre at de er over alt annet */
+        .button-container {
+            position: absolute;
+            top: 20px; /* Plassering av knappene */
+            z-index: 5; /* Sørger for at knappene er over alt */
+            display: flex;
+            gap: 10px; /* Avstand mellom knappene */
+        }
     </style>
 </head>
 <body>
+    <div class="button-container">
+        <button id="requestGyroBtn">Be om Gyroskop Tillatelse</button>
+        <button id="fullscreenBtn">Fullskjerm</button>
+    </div>
     <div class="container">
         <img src="Blomst.png" class="rotating-img" alt="Roterende bilde">
         <img src="MegFØRER.png" class="still-img" alt="Stillestående bilde">
@@ -93,8 +106,6 @@
     </div>
     <input type="range" id="slider" class="slider" min="24" max="90" value="24" />
     <div id="sliderValue">Verdi: 24</div> <!-- Flyttet her for bedre kontroll -->
-    <button id="requestGyroBtn">Be om Gyroskop Tillatelse</button>
-    <button id="fullscreenBtn">Fullskjerm</button>
 
     <script>
         const tower = document.getElementById('tower');
