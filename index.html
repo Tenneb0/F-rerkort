@@ -79,6 +79,10 @@
             width: 300px;
             z-index: 4; /* Sørger for at slideren er over alt */
         }
+
+        .hidden {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -88,13 +92,12 @@
         <div class="tower" id="tower"></div>
     </div>
     <input type="range" id="slider" class="slider" min="0" max="90" value="24" />
+    <div id="sliderValue">Verdi: 24</div> <!-- Flyttet her for bedre kontroll -->
 
     <script>
         const tower = document.getElementById('tower');
         const slider = document.getElementById('slider');
-        const sliderValue = document.createElement('div'); // Legg til en div for å vise verdien
-        sliderValue.style.marginTop = '10px';
-        document.body.appendChild(sliderValue);
+        const sliderValue = document.getElementById('sliderValue');
 
         const numCircles = 10; // Antall sirkler
         const circles = [];
@@ -135,6 +138,8 @@
                     .then(permissionState => {
                         if (permissionState === 'granted') {
                             window.addEventListener('deviceorientation', handleOrientation);
+                            slider.classList.add('hidden'); // Skjul slideren
+                            sliderValue.classList.add('hidden'); // Skjul verdien når gyro er aktiv
                         } else {
                             alert('Gyroskop-tillatelse ble avslått.');
                         }
@@ -143,18 +148,18 @@
             } else {
                 // Hvis ikke på iOS (eller krever ikke tillatelse), bare legg til hendelsen
                 window.addEventListener('deviceorientation', handleOrientation);
+                slider.classList.add('hidden'); // Skjul slideren
+                sliderValue.classList.add('hidden'); // Skjul verdien når gyro er aktiv
             }
         }
 
         // Funksjon som håndterer gyroskop-orientering
         function handleOrientation(event) {
-            const gamma = event.gamma;
-            if (gamma === null || gamma === undefined) return;
-            
-            const adjustedValue = Math.min(Math.max(gamma + 45, 24), 90);
+            const beta = event.beta; // Bytt til beta for opp-ned bevegelse (peker mot og vekk fra deg)
+            if (beta === null || beta === undefined) return;
+
+            const adjustedValue = Math.min(Math.max(beta, 24), 90); // Juster verdiene til området 24-90
             updateCircles(adjustedValue);
-            slider.value = adjustedValue;
-            sliderValue.textContent = `Verdi: ${Math.round(adjustedValue)}`;
         }
 
         // Sjekk om gyroskop er tilgjengelig
