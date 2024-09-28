@@ -153,12 +153,18 @@
             }
         }
 
-        // Funksjon som håndterer gyroskop-orientering
+         // Funksjon som håndterer gyroskop-orientering
         function handleOrientation(event) {
             const beta = event.beta; // Bytt til beta for opp-ned bevegelse (peker mot og vekk fra deg)
             if (beta === null || beta === undefined) return;
 
-            const adjustedValue = Math.min(Math.max(beta, 24), 90); // Juster verdiene til området 24-90
+            // Øk sensitiviteten ved å forsterke verdiene
+            const sensitivityFactor = 1.5; // Juster denne faktoren for mer/færre bevegelser
+            let adjustedValue = beta * sensitivityFactor;
+
+            // Begrens til området 24-90
+            adjustedValue = Math.min(Math.max(adjustedValue, 24), 90);
+            
             updateCircles(adjustedValue);
         }
 
